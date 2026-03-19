@@ -1,24 +1,43 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../api";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState(false);
+
+  // ✅ Auto redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) navigate("/dashboard");
+  }, [navigate]);
+
   const handleLogin = async () => {
     try {
+      setLoading(true);
+
       const res = await API.post("/login", { email, password });
 
       localStorage.setItem("token", res.data.token);
 
-      alert("Login successful");
+      setUser(res.data.user); // ✅ global user
+
+      setMessage("Login successful ✅");
+
       navigate("/dashboard");
 
     } catch (err) {
-      alert("Invalid credentials");
+      setMessage("Invalid credentials ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,19 +46,33 @@ function Login() {
       <h1>Auth System 🚀</h1>
       <h2>Login</h2>
 
+      {/* ✅ Message */}
+      {message && <p className={message.includes("❌") ? "error" : "success"}>
+        {message}
+      </p>}
+
       <input
         type="email"
         placeholder="Email"
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <input
-        type="password"
-        placeholder="Enter your password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      {/* ✅ Password with toggle */}
+      <div className="password-box">
+        <input
+          type={show ? "text" : "password"}
+          placeholder="Enter your password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <span onClick={() => setShow(!show)}>
+          {show ? "Hide" : "Show"}
+        </span>
+      </div>
 
-      <button onClick={handleLogin}>Login</button>
+      {/* ✅ Loading button */}
+      <button onClick={handleLogin}>
+        {loading ? "Logging in..." : "Login"}
+      </button>
 
       <p>
         <Link to="/forgot-password">Forgot Password</Link>
@@ -48,8 +81,6 @@ function Login() {
       <p>
         Don't have an account? <Link to="/signup">Signup</Link>
       </p>
-
-
     </div>
   );
 }

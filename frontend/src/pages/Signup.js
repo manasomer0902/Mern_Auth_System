@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../api";
 
 function Signup() {
@@ -10,15 +9,26 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState(false);
+
   const handleSignup = async () => {
     try {
-     await API.post("/signup", { name, email, password });
+      setLoading(true);
 
-      alert("Signup successful");
-      navigate("/"); // go to login page
+      await API.post("/signup", { name, email, password });
+
+      setMessage("Signup successful ✅");
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
 
     } catch (err) {
-      alert("Error in signup");
+      setMessage("Error in signup ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,13 +37,18 @@ function Signup() {
       <h1>Auth System 🚀</h1>
       <h2>Signup</h2>
 
+      {/* ✅ Message */}
+      {message && (
+        <p className={message.includes("❌") ? "error" : "success"}>
+          {message}
+        </p>
+      )}
+
       <input
         type="text"
         placeholder="Name"
         onChange={(e) => setName(e.target.value)}
       />
-
-      <br /><br />
 
       <input
         type="email"
@@ -41,17 +56,23 @@ function Signup() {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <br /><br />
+      {/* ✅ Password with toggle */}
+      <div className="password-box">
+        <input
+          type={show ? "text" : "password"}
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <span onClick={() => setShow(!show)}>
+          {show ? "Hide" : "Show"}
+        </span>
+      </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      {/* ✅ Loading button */}
+      <button onClick={handleSignup}>
+        {loading ? "Creating..." : "Signup"}
+      </button>
 
-      <br /><br />
-
-      <button onClick={handleSignup}>Signup</button>
       <p>
         Already have an account? <Link to="/">Login</Link>
       </p>

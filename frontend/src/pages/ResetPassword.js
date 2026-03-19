@@ -8,16 +8,26 @@ function ResetPassword() {
 
   const [password, setPassword] = useState("");
 
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState(false);
+
   const handleReset = async () => {
     try {
+      setLoading(true);
+
       await API.post(`/reset-password/${token}`, { password });
 
-      alert("Password reset successful");
+      setMessage("Password reset successful ✅");
 
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 1200);
 
     } catch (err) {
-      alert("Error resetting password");
+      setMessage("Error resetting password ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -26,13 +36,29 @@ function ResetPassword() {
       <h1>Auth System 🚀</h1>
       <h2>Reset Password</h2>
 
-      <input
-        type="password"
-        placeholder="Enter new password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      {/* ✅ Message */}
+      {message && (
+        <p className={message.includes("❌") ? "error" : "success"}>
+          {message}
+        </p>
+      )}
 
-      <button onClick={handleReset}>Reset Password</button>
+      {/* ✅ Password with toggle */}
+      <div className="password-box">
+        <input
+          type={show ? "text" : "password"}
+          placeholder="Enter new password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <span onClick={() => setShow(!show)}>
+          {show ? "Hide" : "Show"}
+        </span>
+      </div>
+
+      {/* ✅ Loading button */}
+      <button onClick={handleReset}>
+        {loading ? "Resetting..." : "Reset Password"}
+      </button>
     </div>
   );
 }

@@ -5,14 +5,21 @@ import API from "../api";
 function ForgotPassword() {
   const [email, setEmail] = useState("");
 
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     try {
+      setLoading(true);
+
       await API.post("/forgot-password", { email });
 
-      alert("Reset link sent to your email");
+      setMessage("Reset link sent to your email ✅");
 
     } catch (err) {
-      alert("Error sending email");
+      setMessage("Error sending email ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -21,13 +28,23 @@ function ForgotPassword() {
       <h1>Auth System 🚀</h1>
       <h2>Forgot Password</h2>
 
+      {/* ✅ Message */}
+      {message && (
+        <p className={message.includes("❌") ? "error" : "success"}>
+          {message}
+        </p>
+      )}
+
       <input
         type="email"
         placeholder="Enter your email"
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <button onClick={handleSubmit}>Send Reset Link</button>
+      {/* ✅ Loading button */}
+      <button onClick={handleSubmit}>
+        {loading ? "Sending..." : "Send Reset Link"}
+      </button>
 
       <p>
         <Link to="/">Back to Login</Link>
