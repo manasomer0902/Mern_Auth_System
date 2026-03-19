@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -17,8 +18,7 @@ function Dashboard() {
       }
 
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/auth/profile",
+        const res = await API.get("/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
