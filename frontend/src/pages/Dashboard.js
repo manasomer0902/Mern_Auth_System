@@ -46,7 +46,8 @@ function Dashboard() {
         <h2>Dashboard 🔐</h2>
 
         {user ? (
-        <div>
+        <div className="card">
+            <h3>👤 User Info</h3>
             <p><b>Name:</b> {user.name}</p>
             <p><b>Email:</b> {user.email}</p>
         </div>
